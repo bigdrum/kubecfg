@@ -19,7 +19,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"sort"
 
 	yaml "gopkg.in/yaml.v2"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -30,28 +29,7 @@ type ShowCmd struct {
 	Format string
 }
 
-func sortAPIObjectsForShow(apiObjects []*unstructured.Unstructured) {
-	sort.Slice(apiObjects, func(i, j int) bool {
-		a := apiObjects[i]
-		b := apiObjects[j]
-		if a.GetNamespace() != b.GetNamespace() {
-			return a.GetNamespace() < b.GetNamespace()
-		}
-		if a.GetName() != b.GetName() {
-			return a.GetName() < b.GetName()
-		}
-		if a.GetKind() != b.GetKind() {
-			return a.GetKind() < b.GetKind()
-		}
-		if a.GetAPIVersion() != b.GetAPIVersion() {
-			return a.GetAPIVersion() < b.GetAPIVersion()
-		}
-		return false
-	})
-}
-
 func (c ShowCmd) Run(apiObjects []*unstructured.Unstructured, out io.Writer) error {
-	sortAPIObjectsForShow(apiObjects)
 	switch c.Format {
 	case "yaml":
 		for _, obj := range apiObjects {
